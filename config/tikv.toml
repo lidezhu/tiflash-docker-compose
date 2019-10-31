@@ -1,0 +1,7 @@
+log-level = "info"
+
+[rocksdb]
+max-open-files = 1024
+
+[raftdb]
+max-open-files = 1024

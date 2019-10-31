@@ -1,0 +1,150 @@
+version: "2.1"
+
+services:
+  pd:
+    image: tiflash:latest
+    build:
+      context: .
+    ports:
+    - "2379"
+    volumes:
+    - ./config/pd.toml:/pd.toml:ro
+    - ./data:/data
+    - ./logs:/logs
+    command:
+    - /pd-server
+    - --name=pd
+    - --client-urls=http://0.0.0.0:2379
+    - --peer-urls=http://0.0.0.0:2380
+    - --advertise-client-urls=http://pd:2379
+    - --advertise-peer-urls=http://pd:2380
+    - --initial-cluster=pd=http://pd:2380
+    - --data-dir=/data/pd
+    - --config=/pd.toml
+    - --log-file=/logs/pd.log
+    restart: on-failure
+  tikv1:
+    image: tiflash:latest
+    build:
+      context: .
+    volumes:
+    - ./config/tikv.toml:/tikv.toml:ro
+    - ./data:/data
+    - ./logs:/logs
+    command:
+    - /tikv-server
+    - --addr=0.0.0.0:20160
+    - --advertise-addr=tikv1:20160
+    - --data-dir=/data/tikv1
+    - --pd=pd:2379
+    - --config=/tikv.toml
+    - --log-file=/logs/tikv1.log
+    depends_on:
+    - "pd"
+    restart: on-failure
+  tikv2:
+    image: tiflash:latest
+    build:
+      context: .
+    volumes:
+    - ./config/tikv.toml:/tikv.toml:ro
+    - ./data:/data
+    - ./logs:/logs
+    command:
+    - /tikv-server
+    - --addr=0.0.0.0:20160
+    - --advertise-addr=tikv2:20160
+    - --data-dir=/data/tikv2
+    - --pd=pd:2379
+    - --config=/tikv.toml
+    - --log-file=/logs/tikv2.log
+    depends_on:
+    - "pd"
+    restart: on-failure
+  tikv3:
+    image: tiflash:latest
+    build:
+      context: .
+    volumes:
+    - ./config/tikv.toml:/tikv.toml:ro
+    - ./data:/data
+    - ./logs:/logs
+    command:
+    - /tikv-server
+    - --addr=0.0.0.0:20160
+    - --advertise-addr=tikv3:20160
+    - --data-dir=/data/tikv3
+    - --pd=pd:2379
+    - --config=/tikv.toml
+    - --log-file=/logs/tikv3.log
+    depends_on:
+    - "pd"
+    restart: on-failure
+  tidb:
+    image: tiflash:latest
+    build:
+      context: .
+    ports:
+    - "4000:4000"
+    - "10080:10080"
+    volumes:
+    - ./config/tidb.toml:/tidb.toml:ro
+    - ./logs:/logs
+    command:
+    - /tidb-server
+    - --store=tikv
+    - --path=pd:2379
+    - --config=/tidb.toml
+    - --log-file=/logs/tidb.log
+    depends_on:
+    - "tikv1"
+    - "tikv2"
+    - "tikv3"
+    restart: on-failure
+  tiflash:
+    image: tiflash:latest
+    build:
+      context: .
+    volumes:
+    - ./config/config.xml:/config.xml:ro
+    - ./config/users.xml:/users.xml:ro
+    - ./logs:/logs
+    - ./data:/data
+    command:
+    - /tiflash
+    - server
+    - --config-file=/config.xml
+    depends_on:
+    - "tidb"
+  rngine:
+    image: tiflash:latest
+    build:
+      context: .
+    volumes:
+    - ./config/rngine.toml:/rngine.toml:ro
+    - ./data:/data
+    - ./logs:/logs
+    command:
+    - /tikv-server
+    - --addr=0.0.0.0:20160
+    - --advertise-addr=rngine:20160
+    - --data-dir=/data/rngine
+    - --pd=pd:2379
+    - --config=/rngine.toml
+    - --log-file=/logs/rngine.log
+    depends_on:
+    - "tiflash"
+    restart: on-failure
+  flash_cluster_manager:
+    build:
+      context: .
+    image: tiflash:latest
+    volumes:
+    - ./config/config.xml:/config.xml:ro
+    - ./config/users.xml:/users.xml:ro
+    - ./logs:/logs
+    command:
+    - /flash-cluster-manager
+    - /config.xml
+    depends_on:
+    - "rngine"
