@@ -105,6 +105,8 @@ services:
     image: tiflash:latest
     build:
       context: .
+    ports:
+    - "9000"
     volumes:
     - ./config/config.xml:/config.xml:ro
     - ./config/users.xml:/users.xml:ro
@@ -125,7 +127,7 @@ services:
     - ./data:/data
     - ./logs:/logs
     command:
-    - /tikv-server
+    - /tikv-server-rngine
     - --addr=0.0.0.0:20160
     - --advertise-addr=rngine:20160
     - --data-dir=/data/rngine
@@ -142,7 +144,7 @@ services:
     volumes:
     - ./config/config.xml:/config.xml:ro
     - ./config/users.xml:/users.xml:ro
-    - ./logs:/logs
+    - ./logs/tiflash-cluster-manager0:/data/tiflash/tmp
     command:
     - /flash-cluster-manager
     - /config.xml

@@ -12,7 +12,7 @@
 
 [server]
 labels = { "engine" = "tiflash", "tiflash_http_port" = "8123" }
-engine-addr = "127.0.0.1:3930" # tics address
+engine-addr = "tiflash:3930" # tics address
 
 [storage]
 

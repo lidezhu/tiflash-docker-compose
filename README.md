@@ -20,6 +20,7 @@ docker-compose up
 ``` shell
 mysql -h 127.0.0.1 -P 4000 -u root -D test --comments
 MySQL [test]> create table cluster (id int, name varchar(10));
+MySQL [test]> insert into cluster values(10, "name");
 MySQL [test]> alter table test.cluster set tiflash replica 1;
 MySQL [test]> select /*+ read_from_storage(tiflash[t]) */ count(*) from test.cluster t;
 MySQL [test]> explain select /*+ read_from_storage(tiflash[t]) */ count(*) from test.cluster t;
