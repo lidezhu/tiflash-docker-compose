@@ -5,61 +5,6 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: rngine
-spec:
-  selector:
-    matchLabels:
-      app: rngine
-  serviceName: rngine
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: rngine
-    spec:
-      containers:
-      - name: rngine
-        image: hub.pingcap.net/tiflash/tikv-learner:191025
-        command:
-        - --addr=0.0.0.0:20170
-        - --advertise-addr=${MY_POD_NAME}.rngine.${MY_NAMESPACE}.svc:20170
-        - --data-dir=/data/rngine
-        - --pd=tiflash-test-cluster-pd.${MY_NAMESPACE}.svc:2379
-        - --config=/etc/rngine/rngine.toml
-        env:
-        - name: MY_POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: MY_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        volumeMounts:
-        - name: data
-          mountPath: /data
-        - name: config
-          mountPath: /etc/rngine
-      volumes:
-      - name: config
-        configMap:
-          name: tiflash
-          items:
-          - key: rngine.toml
-            path: rngine.toml
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "local-storage"
-      resources:
-        requests:
-          storage: 10Gi
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
   name: tiflash
 spec:
   selector:
@@ -141,6 +86,61 @@ spec:
             path: config.xml
           - key: users.xml
             path: users.xml
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "local-storage"
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rngine
+spec:
+  selector:
+    matchLabels:
+      app: rngine
+  serviceName: rngine
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rngine
+    spec:
+      containers:
+      - name: rngine
+        image: hub.pingcap.net/tiflash/tikv-learner:191025
+        command:
+        - --addr=0.0.0.0:20170
+        - --advertise-addr=${MY_POD_NAME}.rngine.${MY_NAMESPACE}.svc:20170
+        - --data-dir=/data/rngine
+        - --pd=tiflash-test-cluster-pd.${MY_NAMESPACE}.svc:2379
+        - --config=/etc/rngine/rngine.toml
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /etc/rngine
+      volumes:
+      - name: config
+        configMap:
+          name: tiflash
+          items:
+          - key: rngine.toml
+            path: rngine.toml
   volumeClaimTemplates:
   - metadata:
       name: data
