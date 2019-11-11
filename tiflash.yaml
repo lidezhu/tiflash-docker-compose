@@ -19,11 +19,10 @@ spec:
     spec:
       containers:
       - name: rngine
-        image: tiflash
+        image: hub.pingcap.net/tiflash/tikv-learner:191025
         command:
-        - /tikv-server-rngine
-        - --addr=0.0.0.0:20160
-        - --advertise-addr=${MY_POD_NAME}.rngine.${MY_NAMESPACE}.svc:20160
+        - --addr=0.0.0.0:20170
+        - --advertise-addr=${MY_POD_NAME}.rngine.${MY_NAMESPACE}.svc:20170
         - --data-dir=/data/rngine
         - --pd=TIDB_CLUSTER_NAME-pd.${MY_NAMESPACE}.svc:2379
         - --config=/etc/rngine/rngine.toml
@@ -75,11 +74,9 @@ spec:
     spec:
       containers:
       - name: tiflash
-        image: tiflash
+        image: hub.pingcap.net/tiflash/tics:master
         command:
-        - /tiflash
-        - server
-        - --config-file=/etc/tiflash/config.xml
+        - --config-file /etc/tiflash/config.xml
         volumeMounts:
         - name: data
           mountPath: /data
@@ -89,9 +86,8 @@ spec:
           mountPath: /logs
       # TODO: decide if flash-cluster-manager should be deployed along side with tiflash
       - name: flash-cluster-manager
-        image: tiflash
+        image: hub.pingcap.net/tiflash/cluster_manage:latest
         command:
-        - /flash-cluster-manager
         - /etc/tiflash/config.xml
         volumeMounts:
         - name: data
@@ -256,12 +252,12 @@ data:
 
         <flash>
           <service_addr>tiflash-0.tiflash.MY_NAMESPACE.svc:3930</service_addr> <!--tics address-->
-            <flash_cluster>
-                <master_ttl>60</master_ttl>
-                <refresh_interval>20</refresh_interval>
-                <update_rule_interval>5</update_rule_interval>
-            </flash_cluster>
-            <tidb_status_addr>TIDB_CLUSTER_NAME-tidb:10080</tidb_status_addr>
+          <flash_cluster>
+            <master_ttl>60</master_ttl>
+            <refresh_interval>20</refresh_interval>
+            <update_rule_interval>5</update_rule_interval>
+          </flash_cluster>
+          <tidb_status_addr>TIDB_CLUSTER_NAME-tidb:10080</tidb_status_addr>
         </flash>
 
         <http_port>8123</http_port>
