@@ -24,7 +24,7 @@ spec:
         - --addr=0.0.0.0:20170
         - --advertise-addr=${MY_POD_NAME}.rngine.${MY_NAMESPACE}.svc:20170
         - --data-dir=/data/rngine
-        - --pd=tiflash-test-cluster-pd.${MY_NAMESPACE}.svc:2379
+        - --pd=TIDB_CLUSTER_NAME-pd.${MY_NAMESPACE}.svc:2379
         - --config=/etc/rngine/rngine.toml
         env:
         - name: MY_POD_NAME
@@ -244,7 +244,7 @@ data:
 
         <raft>
             <kvstore_path>/data/tiflash/kvstore</kvstore_path>
-            <pd_addr>tiflash-test-cluster-pd:2379</pd_addr>
+            <pd_addr>TIDB_CLUSTER_NAME-pd:2379</pd_addr>
             <ignore_databases>system</ignore_databases>
             <learner_key>engine</learner_key>
             <learner_value>tiflash</learner_value>
@@ -257,7 +257,7 @@ data:
             <refresh_interval>20</refresh_interval>
             <update_rule_interval>5</update_rule_interval>
           </flash_cluster>
-          <tidb_status_addr>tiflash-test-cluster-tidb:10080</tidb_status_addr>
+          <tidb_status_addr>TIDB_CLUSTER_NAME-tidb:10080</tidb_status_addr>
         </flash>
 
         <http_port>8123</http_port>
