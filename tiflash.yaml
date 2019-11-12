@@ -30,16 +30,6 @@ spec:
           mountPath: /etc/tiflash
         - name: logs
           mountPath: /logs
-      # TODO: decide if flash-cluster-manager should be deployed along side with tiflash
-      - name: flash-cluster-manager
-        image: hub.pingcap.net/tiflash/cluster_manage:latest
-        args:
-        - /etc/tiflash/config.xml
-        volumeMounts:
-        - name: data
-          mountPath: /data
-        - name: config
-          mountPath: /etc/tiflash
       # To better support k8s, allow normal log to output stdout,
       # so only the error log tailer is needed
       - name: tiflash-log
@@ -61,18 +51,6 @@ spec:
         - |
           touch /logs/tiflash-error.log
           tail -n0 -F /logs/tiflash-error.log
-        volumeMounts:
-        - name: logs
-          mountPath: /logs
-      - name: flash-cluster-manager-log
-        image: busybox
-        # TODO: The log directory is weird, can we just log to stdout?
-        command:
-        - /bin/sh
-        - -c
-        - |
-          touch /data/tiflash/tmp/flash_cluster_manager.log
-          tail -n0 -F /data/tiflash/tmp/flash_cluster_manager.log
         volumeMounts:
         - name: logs
           mountPath: /logs
@@ -119,7 +97,7 @@ spec:
         - --addr=0.0.0.0:20170
         - --advertise-addr=${MY_POD_NAME}.rngine.${MY_NAMESPACE}.svc:20170
         - --data-dir=/data/rngine
-        - --pd=tiflash-test-cluster-pd.${MY_NAMESPACE}.svc:2379
+        - --pd=tiflash-test-cluster-pd.tiflash-test.svc:2379
         - --config=/etc/rngine/rngine.toml
         env:
         - name: MY_POD_NAME
@@ -142,6 +120,63 @@ spec:
           items:
           - key: rngine.toml
             path: rngine.toml
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "local-storage"
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cluster_manage
+spec:
+  selector:
+    matchLabels:
+      app: cluster_manage
+  serviceName: cluster_manage
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cluster_manage
+    spec:
+      containers:
+      # TODO: decide if flash-cluster-manager should be deployed along side with tiflash
+      - name: flash-cluster-manager
+        image: hub.pingcap.net/tiflash/cluster_manage:latest
+        args:
+        - /etc/tiflash/config.xml
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /etc/tiflash
+      - name: flash-cluster-manager-log
+        image: busybox
+        # TODO: The log directory is weird, can we just log to stdout?
+        command:
+        - /bin/sh
+        - -c
+        - |
+          touch /data/tiflash/tmp/flash_cluster_manager.log
+          tail -n0 -F /data/tiflash/tmp/flash_cluster_manager.log
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: config
+        configMap:
+          name: tiflash
+          items:
+          - key: config.xml
+            path: config.xml
+          - key: users.xml
+            path: users.xml
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -179,6 +214,17 @@ spec:
     app: tiflash
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  name: cluster_manage
+  labels:
+    app: cluster_manage
+spec:
+  clusterIP: None
+  selector:
+    app: cluster_manage
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: tiflash
@@ -190,7 +236,7 @@ data:
     labels = { "engine" = "tiflash", "tiflash_http_port" = "8123" }
     # TODO: does tiflash support multiple instances, how should we configure the engine-addr if there are multiple tiflash instance
     # Replace the MY_NAMESPACE with the real namespace
-    engine-addr = "tiflash-0.tiflash.MY_NAMESPACE.svc:3930" # tics address
+    engine-addr = "tiflash-0.tiflash.default.svc:3930" # tics address
     [storage]
     [pd]
     # This section will be overwritten by command line parameters
@@ -252,7 +298,7 @@ data:
         </raft>
 
         <flash>
-          <service_addr>tiflash-0.tiflash.MY_NAMESPACE.svc:3930</service_addr> <!--tics address-->
+          <service_addr>tiflash-0.tiflash.default.svc:3930</service_addr> <!--tics address-->
           <flash_cluster>
             <master_ttl>60</master_ttl>
             <refresh_interval>20</refresh_interval>
