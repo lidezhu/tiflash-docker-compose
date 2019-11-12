@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
       - name: tiflash
-        image: hub.pingcap.net/tiflash/tics:master
-        command:
+        image: hub.pingcap.net/tiflash/tics-with-tools
+        args:
         - --config-file 
         - /etc/tiflash/config.xml
         volumeMounts:
@@ -33,7 +33,7 @@ spec:
       # TODO: decide if flash-cluster-manager should be deployed along side with tiflash
       - name: flash-cluster-manager
         image: hub.pingcap.net/tiflash/cluster_manage:latest
-        command:
+        args:
         - /etc/tiflash/config.xml
         volumeMounts:
         - name: data
