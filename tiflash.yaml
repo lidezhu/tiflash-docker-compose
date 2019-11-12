@@ -93,7 +93,7 @@ spec:
       containers:
       - name: rngine
         image: hub.pingcap.net/tiflash/tikv-learner:191025
-        command:
+        args:
         - --addr=0.0.0.0:20170
         - --advertise-addr=${MY_POD_NAME}.rngine.${MY_NAMESPACE}.svc:20170
         - --data-dir=/data/rngine
