@@ -21,7 +21,8 @@ spec:
       - name: tiflash
         image: hub.pingcap.net/tiflash/tics:master
         command:
-        - --config-file /etc/tiflash/config.xml
+        - --config-file 
+        - /etc/tiflash/config.xml
         volumeMounts:
         - name: data
           mountPath: /data
@@ -224,7 +225,7 @@ data:
 
   # To better support K8s, the related address needs to be configured from command line arguments.
   # eg. raft.pd_addr, flash.service_addr, flash.tidb_status_addr
-  tiflash-config.xml: |
+  config.xml: |
     <?xml version="1.0"?>
     <yandex>
         <application>
@@ -244,7 +245,7 @@ data:
 
         <raft>
             <kvstore_path>/data/tiflash/kvstore</kvstore_path>
-            <pd_addr>tiflash-test-cluster-pd:2379</pd_addr>
+            <pd_addr>tiflash-test-cluster-pd.tiflash-test.svc:2379</pd_addr>
             <ignore_databases>system</ignore_databases>
             <learner_key>engine</learner_key>
             <learner_value>tiflash</learner_value>
@@ -257,7 +258,7 @@ data:
             <refresh_interval>20</refresh_interval>
             <update_rule_interval>5</update_rule_interval>
           </flash_cluster>
-          <tidb_status_addr>tiflash-test-cluster-tidb:10080</tidb_status_addr>
+          <tidb_status_addr>tiflash-test-cluster-tidb.tiflash-test.svc:10080</tidb_status_addr>
         </flash>
 
         <http_port>8123</http_port>
@@ -419,7 +420,7 @@ data:
         <max_table_size_to_drop>0</max_table_size_to_drop>
     </yandex>
 
-  tiflash-user.xml: |
+  users.xml: |
     <?xml version="1.0"?>
     <yandex>
         <!-- Profiles of settings. -->
