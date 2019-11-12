@@ -133,17 +133,17 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: cluster_manage
+  name: cluster-manage
 spec:
   selector:
     matchLabels:
-      app: cluster_manage
-  serviceName: cluster_manage
+      app: cluster-manage
+  serviceName: cluster-manage
   replicas: 1
   template:
     metadata:
       labels:
-        app: cluster_manage
+        app: cluster-manage
     spec:
       containers:
       # TODO: decide if flash-cluster-manager should be deployed along side with tiflash
@@ -216,13 +216,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cluster_manage
+  name: cluster-manage
   labels:
-    app: cluster_manage
+    app: cluster-manage
 spec:
   clusterIP: None
   selector:
-    app: cluster_manage
+    app: cluster-manage
 ---
 apiVersion: v1
 kind: ConfigMap
