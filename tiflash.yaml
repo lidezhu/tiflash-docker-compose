@@ -93,8 +93,9 @@ spec:
       containers:
       # TODO: decide if flash-cluster-manager should be deployed along side with tiflash
       - name: flash-cluster-manager
-        image: hub.pingcap.net/tiflash/cluster_manage:latest
-        args:
+        image: hub.pingcap.net/tiflash/flash-cluster-manager:latest
+        command:
+        - /flash-cluster-manager
         - /etc/tiflash/config.xml
         volumeMounts:
         - name: data2
