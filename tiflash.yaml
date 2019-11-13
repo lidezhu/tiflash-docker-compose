@@ -140,8 +140,10 @@ metadata:
     app: tiflash
 spec:
   ports:
-  - port: 3930 # TODO: what the 8123, 9000 and 9009 port for, which type of service should we use for these service port?
-  - port: 9000
+  - name: flash
+    port: 3930 # TODO: what the 8123, 9000 and 9009 port for, which type of service should we use for these service port?
+  - name: tcp
+    port: 9000
   clusterIP: None
   selector:
     app: tiflash
