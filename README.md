@@ -27,3 +27,20 @@ MySQL [test]> explain select /*+ read_from_storage(tiflash[t]) */ count(*) from 
 ```
 
 If the plan output contains `tiflash`, then the TiFlash cluster is normal.
+
+# TiFlash k8s cluster
+1. use `kind` deploy tidb cluster(https://pingcap.com/docs-cn/stable/tidb-in-kubernetes/get-started/deploy-tidb-from-kubernetes-kind/)
+
+2. kubectl apply -f tiflash.yaml
+
+3. wait for tiflash and cluster-manage pod ready (`watch kubectl get pods`)
+
+4. kubectl apply -f rngine.yaml
+
+5. kubectl port-forward -n tiflash-test svc/tiflash-test-cluster-tidb 4000:4000 &  
+   
+6. mysql -h 127.0.0.1 -P 4000 -u root -D test
+
+notes:
+1. check pd,tikv,tidb version
+2. remember to modify pd config
