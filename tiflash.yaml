@@ -78,61 +78,6 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: rngine
-spec:
-  selector:
-    matchLabels:
-      app: rngine
-  serviceName: rngine
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: rngine
-    spec:
-      containers:
-      - name: rngine
-        image: hub.pingcap.net/tiflash/tikv-learner:191025
-        args:
-        - --addr=0.0.0.0:20170
-        - --advertise-addr=${MY_POD_NAME}.rngine.${MY_NAMESPACE}.svc:20170
-        - --data-dir=/data/rngine
-        - --pd=tiflash-test-cluster-pd.tiflash-test.svc:2379
-        - --config=/etc/rngine/rngine.toml
-        env:
-        - name: MY_POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: MY_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        volumeMounts:
-        - name: data
-          mountPath: /data
-        - name: config
-          mountPath: /etc/rngine
-      volumes:
-      - name: config
-        configMap:
-          name: tiflash
-          items:
-          - key: rngine.toml
-            path: rngine.toml
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "local-storage"
-      resources:
-        requests:
-          storage: 10Gi
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
   name: cluster-manage
 spec:
   selector:
@@ -190,25 +135,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: rngine
-  labels:
-    app: rngine
-spec:
-  ports:
-  - port: 20160
-  clusterIP: None
-  selector:
-    app: rngine
----
-apiVersion: v1
-kind: Service
-metadata:
   name: tiflash
   labels:
     app: tiflash
 spec:
   ports:
   - port: 3930 # TODO: what the 8123, 9000 and 9009 port for, which type of service should we use for these service port?
+  - port: 9000
   clusterIP: None
   selector:
     app: tiflash

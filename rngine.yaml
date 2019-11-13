@@ -1,0 +1,71 @@
+# 0. The tiflash image needs to be pushed to a Docker registry, and the following `image` field need to be adjusted to the registry address.
+# 1. helm install pingcap/tidb-cluster --name=${TIDB_CLUSTER_NAME} --namespace=${MY-NAMESPACE} --version=v1.0.2 --set pd.image=tiflash,tikv.image=tiflash,tidb.image=tiflash
+# 2. Replace the following TIDB_CLUSTER_NAME with the real tidb cluster name.
+# 3. kubectl apply -f tiflash.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rngine
+spec:
+  selector:
+    matchLabels:
+      app: rngine
+  serviceName: rngine
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rngine
+    spec:
+      containers:
+      - name: rngine
+        image: hub.pingcap.net/tiflash/tikv-learner:191025
+        args:
+        - --addr=0.0.0.0:20170
+        - --advertise-addr=${MY_POD_NAME}.rngine.${MY_NAMESPACE}.svc:20170
+        - --data-dir=/data/rngine
+        - --pd=tiflash-test-cluster-pd.tiflash-test.svc:2379
+        - --config=/etc/rngine/rngine.toml
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /etc/rngine
+      volumes:
+      - name: config
+        configMap:
+          name: tiflash
+          items:
+          - key: rngine.toml
+            path: rngine.toml
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "local-storage"
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rngine
+  labels:
+    app: rngine
+spec:
+  ports:
+  - port: 20160
+  clusterIP: None
+  selector:
+    app: rngine
