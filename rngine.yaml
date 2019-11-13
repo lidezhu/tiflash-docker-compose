@@ -22,7 +22,7 @@ spec:
         image: hub.pingcap.net/tiflash/tikv-learner:191025
         args:
         - --addr=0.0.0.0:20170
-        - --advertise-addr=${MY_POD_NAME}.rngine.${MY_NAMESPACE}.svc:20170
+        - --advertise-addr=rngine-0.rngine.default.svc:20170
         - --data-dir=/data/rngine
         - --pd=tiflash-test-cluster-pd.tiflash-test.svc:2379
         - --config=/etc/rngine/rngine.toml
