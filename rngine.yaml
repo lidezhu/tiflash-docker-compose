@@ -38,12 +38,12 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
-        - name: config
+        - name: config2
           mountPath: /etc/rngine
       volumes:
-      - name: config
+      - name: config2
         configMap:
-          name: tiflash
+          name: rngine
           items:
           - key: rngine.toml
             path: rngine.toml
@@ -69,3 +69,47 @@ spec:
   clusterIP: None
   selector:
     app: rngine
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rngine
+data:
+  rngine.toml: |
+    [readpool.storage]
+    [readpool.coprocessor]
+    [server]
+    labels = { "engine" = "tiflash", "tiflash_http_port" = "8123" }
+    # TODO: does tiflash support multiple instances, how should we configure the engine-addr if there are multiple tiflash instance
+    # Replace the MY_NAMESPACE with the real namespace
+    engine-addr = "tiflash-0.tiflash.default.svc:3930" # tics address
+    [storage]
+    [pd]
+    # This section will be overwritten by command line parameters
+    [metric]
+    #address = "172.16.30.31:9531"
+    #interval = "15s"
+    #job = "tikv"
+    [raftstore]
+    raftdb-path = ""
+    sync-log = true
+    max-leader-missing-duration = "22s"
+    abnormal-leader-missing-duration = "21s"
+    peer-stale-state-check-interval = "20s"
+    [coprocessor]
+    [rocksdb]
+    wal-dir = ""
+    [rocksdb.defaultcf]
+    block-cache-size = "10GB"
+    [rocksdb.lockcf]
+    block-cache-size = "4GB"
+    [rocksdb.writecf]
+    block-cache-size = "4GB"
+    [raftdb]
+    [raftdb.defaultcf]
+    block-cache-size = "1GB"
+    [security]
+    ca-path = ""
+    cert-path = ""
+    key-path = ""
+    [import]

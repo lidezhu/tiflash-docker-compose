@@ -140,10 +140,7 @@ metadata:
     app: tiflash
 spec:
   ports:
-  - name: flash
-    port: 3930 # TODO: what the 8123, 9000 and 9009 port for, which type of service should we use for these service port?
-  - name: tcp
-    port: 9000
+  - port: 3930 # TODO: what the 8123, 9000 and 9009 port for, which type of service should we use for these service port?
   clusterIP: None
   selector:
     app: tiflash
@@ -164,46 +161,6 @@ kind: ConfigMap
 metadata:
   name: tiflash
 data:
-  rngine.toml: |
-    [readpool.storage]
-    [readpool.coprocessor]
-    [server]
-    labels = { "engine" = "tiflash", "tiflash_http_port" = "8123" }
-    # TODO: does tiflash support multiple instances, how should we configure the engine-addr if there are multiple tiflash instance
-    # Replace the MY_NAMESPACE with the real namespace
-    engine-addr = "tiflash-0.tiflash.default.svc:3930" # tics address
-    [storage]
-    [pd]
-    # This section will be overwritten by command line parameters
-    [metric]
-    #address = "172.16.30.31:9531"
-    #interval = "15s"
-    #job = "tikv"
-    [raftstore]
-    raftdb-path = ""
-    sync-log = true
-    max-leader-missing-duration = "22s"
-    abnormal-leader-missing-duration = "21s"
-    peer-stale-state-check-interval = "20s"
-    [coprocessor]
-    [rocksdb]
-    wal-dir = ""
-    [rocksdb.defaultcf]
-    block-cache-size = "10GB"
-    [rocksdb.lockcf]
-    block-cache-size = "4GB"
-    [rocksdb.writecf]
-    block-cache-size = "4GB"
-    [raftdb]
-    [raftdb.defaultcf]
-    block-cache-size = "1GB"
-    [security]
-    ca-path = ""
-    cert-path = ""
-    key-path = ""
-    [import]
-
-
   # To better support K8s, the related address needs to be configured from command line arguments.
   # eg. raft.pd_addr, flash.service_addr, flash.tidb_status_addr
   config.xml: |
