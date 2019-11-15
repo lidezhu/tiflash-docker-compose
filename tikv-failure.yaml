@@ -1,0 +1,16 @@
+apiVersion: pingcap.com/v1alpha1
+kind: PodChaos
+metadata:
+  name: tikv-failure
+  namespace: chaos-testing
+spec:
+  action: pod-failure
+  mode: one
+  duration: "30s"
+  selector:
+    namespaces:
+      - tiflash-test
+    labelSelectors:
+      "app.kubernetes.io/component": "tikv"
+  scheduler:
+    cron: "@every 2m"
