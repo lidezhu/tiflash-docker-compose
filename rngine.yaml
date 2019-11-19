@@ -31,6 +31,8 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
+        - name: config100
+          mountPath: /etc/rngine_templ
       containers:
       - name: rngine
         image: hub.pingcap.net/tiflash/kube-test-rngine
@@ -52,8 +54,6 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
-        - name: config100
-          mountPath: /etc/rngine_templ
       volumes:
       - name: config100
         configMap:
