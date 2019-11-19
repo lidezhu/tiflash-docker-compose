@@ -11,7 +11,7 @@ spec:
     matchLabels:
       app: tiflash
   serviceName: tiflash
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -24,7 +24,7 @@ spec:
         - --config-file 
         - /etc/tiflash/config.xml
         volumeMounts:
-        - name: data3
+        - name: data
           mountPath: /data
         - name: config
           mountPath: /etc/tiflash
@@ -67,7 +67,7 @@ spec:
             path: users.xml
   volumeClaimTemplates:
   - metadata:
-      name: data3
+      name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: "local-storage"
@@ -98,7 +98,7 @@ spec:
         - /flash-cluster-manager
         - /etc/tiflash/cluster-manager-config.xml
         volumeMounts:
-        - name: data3
+        - name: data
           mountPath: /data
         - name: config
           mountPath: /etc/tiflash
@@ -112,7 +112,7 @@ spec:
           touch /data/tiflash/tmp/flash_cluster_manager.log
           tail -n0 -F /data/tiflash/tmp/flash_cluster_manager.log
         volumeMounts:
-        - name: data3
+        - name: data
           mountPath: /data
       volumes:
       - name: config
@@ -127,7 +127,7 @@ spec:
             path: cluster-manager-config.xml
   volumeClaimTemplates:
   - metadata:
-      name: data3
+      name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: "local-storage"

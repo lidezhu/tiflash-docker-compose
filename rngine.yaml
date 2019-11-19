@@ -11,22 +11,34 @@ spec:
     matchLabels:
       app: rngine
   serviceName: rngine
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
         app: rngine
     spec:
+      initContainers:
+      - name: init-rngine
+        image: hub.pingcap.net/tiflash/kube-test-rngine
+        command:
+        - bash
+        - "-c"
+        - |
+          set -ex
+          [[ `hostname` =~ -([0-9]+)$ ]] || exit 1
+          ordinal=${BASH_REMATCH[1]}
+          sed s/{pod_num}/${ordinal}/g /etc/rngine_templ/rngine_templ.toml > /data/rngine.toml
+        - name: data3
+          mountPath: /data
       containers:
       - name: rngine
         image: hub.pingcap.net/tiflash/kube-test-rngine
         command:
         - /tikv-server-rngine
         - --addr=0.0.0.0:20170
-        - --advertise-addr=rngine-0.rngine.default.svc:20170
         - --data-dir=/data/rngine
         - --pd=tiflash-test-cluster-pd.tiflash-test.svc:2379
-        - --config=/etc/rngine/rngine.toml
+        - --config=/data/rngine.toml
         env:
         - name: MY_POD_NAME
           valueFrom:
@@ -37,20 +49,20 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         volumeMounts:
-        - name: data3
+        - name: data
           mountPath: /data
-        - name: config2
-          mountPath: /etc/rngine
+        - name: config_rngine
+          mountPath: /etc/rngine_templ
       volumes:
-      - name: config2
+      - name: config_rngine
         configMap:
           name: rngine
           items:
-          - key: rngine.toml
-            path: rngine.toml
+          - key: rngine_templ.toml
+            path: rngine_templ.toml
   volumeClaimTemplates:
   - metadata:
-      name: data3
+      name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: "local-storage"
@@ -66,7 +78,7 @@ metadata:
     app: rngine
 spec:
   ports:
-  - port: 20160
+  - port: 20170
   clusterIP: None
   selector:
     app: rngine
@@ -76,14 +88,15 @@ kind: ConfigMap
 metadata:
   name: rngine
 data:
-  rngine.toml: |
+  rngine_templ.toml: |
     [readpool.storage]
     [readpool.coprocessor]
     [server]
     labels = { "engine" = "tiflash", "tiflash_http_port" = "8123" }
     # TODO: does tiflash support multiple instances, how should we configure the engine-addr if there are multiple tiflash instance
     # Replace the MY_NAMESPACE with the real namespace
-    engine-addr = "tiflash-0.tiflash.default.svc:3930" # tics address
+    engine-addr = "tiflash-{pod_num}.tiflash.default.svc:3930" # tics address
+    advertise-addr = "rngine-{pod_num}.rngine.default.svc:20170"
     [storage]
     [pd]
     # This section will be overwritten by command line parameters
