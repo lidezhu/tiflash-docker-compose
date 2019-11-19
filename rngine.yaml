@@ -29,7 +29,7 @@ spec:
           ordinal=${BASH_REMATCH[1]}
           sed s/{pod_num}/${ordinal}/g /etc/rngine_templ/rngine_templ.toml > /data/rngine.toml
         volumeMounts:
-        - name: data3
+        - name: data
           mountPath: /data
       containers:
       - name: rngine
@@ -52,10 +52,10 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
-        - name: config_rngine
+        - name: config100
           mountPath: /etc/rngine_templ
       volumes:
-      - name: config_rngine
+      - name: config100
         configMap:
           name: rngine
           items:
