@@ -19,7 +19,7 @@ spec:
     spec:
       initContainers:
       - name: init-rngine
-        image: hub.pingcap.net/tiflash/kube-test-rngine
+        image: hub.pingcap.net/tiflash/kube-test-rngine:latest
         command:
         - bash
         - "-c"
@@ -35,7 +35,8 @@ spec:
           mountPath: /etc/rngine_templ
       containers:
       - name: rngine
-        image: hub.pingcap.net/tiflash/kube-test-rngine
+        image: hub.pingcap.net/tiflash/kube-test-rngine:latest
+        imagePullPolicy: Always
         command:
         - /tikv-server-rngine
         - --addr=0.0.0.0:20170
