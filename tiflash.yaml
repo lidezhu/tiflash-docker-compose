@@ -19,8 +19,9 @@ spec:
     spec:
       containers:
       - name: tiflash
-        image: hub.pingcap.net/tiflash/tics-with-tools
+        image: hub.pingcap.net/tiflash/tics:k8s2019113003
         args:
+        - server
         - --config-file 
         - /etc/tiflash/config.xml
         volumeMounts:
@@ -73,7 +74,7 @@ spec:
       storageClassName: "local-storage"
       resources:
         requests:
-          storage: 10Gi
+          storage: 100Gi
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -133,7 +134,7 @@ spec:
       storageClassName: "local-storage"
       resources:
         requests:
-          storage: 10Gi
+          storage: 100Gi
 ---
 apiVersion: v1
 kind: Service
