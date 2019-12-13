@@ -22,7 +22,7 @@ spec:
         image: hub.pingcap.net/tiflash/tics:k8s2019113003
         args:
         - server
-        - --config-file 
+        - --config-file
         - /etc/tiflash/config.xml
         volumeMounts:
         - name: data
