@@ -42,7 +42,11 @@ If the plan output contains `tiflash`, then the TiFlash cluster is normal.
 6. mysql -h 127.0.0.1 -P 4000 -u root -D test
 
 # chaos test
-1. kubectl apply -f tikv-failure.yaml
+1. kubectl create namespace tiflash-chaos-testing
+
+2. kubectl apply -f tikv-failure.yaml -n tiflash-chaos-testing
+
+3. kubectl apply -f tiflash-failure.yaml -n tiflash-chaos-testing
 
 notes:
 1. check pd,tikv,tidb version
