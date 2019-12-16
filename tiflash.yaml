@@ -35,8 +35,7 @@ spec:
           mountPath: /data
         - name: config
           mountPath: /etc/tiflash
-      containers:
-      - name: tiflash
+      - name: check-dns
         image: hub.pingcap.net/tiflash/tics:k8s121601
         command:
         - bash
@@ -53,6 +52,10 @@ spec:
             fi
             sleep 1
           done
+      containers:
+      - name: tiflash
+        image: hub.pingcap.net/tiflash/tics:k8s121601
+        command:
         - /tiflash
         - server
         - --config-file
