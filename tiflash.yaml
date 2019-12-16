@@ -95,14 +95,12 @@ spec:
         configMap:
           name: tiflash
           items:
-          - key: config.toml
-            path: config.toml
+          - key: config_templ.toml
+            path: config_templ.toml
           - key: users.toml
             path: users.toml
-          - key: proxy.toml
-            path: proxy.toml
-          - key: manager.toml
-            path: manager.toml
+          - key: proxy_templ.toml
+            path: proxy_templ.toml
   volumeClaimTemplates:
   - metadata:
       name: data
