@@ -57,6 +57,9 @@ spec:
         - server
         - --config-file
         - /data/config.toml
+        env:
+        - name: LD_LIBRARY_PATH
+          value: /
         volumeMounts:
         - name: data
           mountPath: /data
