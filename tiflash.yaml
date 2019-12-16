@@ -35,23 +35,6 @@ spec:
           mountPath: /data
         - name: config
           mountPath: /etc/tiflash
-      - name: check-dns
-        image: hub.pingcap.net/tiflash/tics:k8s121601
-        command:
-        - bash
-        - "-c"
-        - |
-          set -ex
-          [[ `hostname` =~ -([0-9]+)$ ]] || exit 1
-          ordinal=${BASH_REMATCH[1]}
-          set +ex
-          while true; do
-            nslookup tiflash-${ordinal}.tiflash.tiflash-test2.svc
-            if [ ${?} -eq 0 ]; then
-              break;
-            fi
-            sleep 1
-          done
       containers:
       - name: tiflash
         image: hub.pingcap.net/tiflash/tics:k8s121601
