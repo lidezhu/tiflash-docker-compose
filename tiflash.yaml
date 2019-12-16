@@ -1,7 +1,7 @@
-# 0. The tiflash image needs to be pushed to a Docker registry, and the following `image` field need to be adjusted to the registry address.
-# 1. helm install pingcap/tidb-cluster --name=${TIDB_CLUSTER_NAME} --namespace=${MY-NAMESPACE} --version=v1.0.2 --set pd.image=tiflash,tikv.image=tiflash,tidb.image=tiflash
-# 2. Replace the following TIDB_CLUSTER_NAME with the real tidb cluster name.
-# 3. kubectl apply -f tiflash.yaml
+# 0. Build tiflash image and replace all images in this file
+# 1. choose your cluster namespace(tiflash-test in this file), and replace 'tiflash-test' with your namespace
+# 2. install tidb-cluster using tidb-operator in the namespace you choosed
+# 3. kubectl apply -f tiflash.yaml -n {your-namespace}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -18,6 +18,23 @@ spec:
         app: tiflash
     spec:
       initContainers:
+      - name: ensure-dns
+        image: hub.pingcap.net/tiflash/tiflash:k8s20191213
+        command:
+        - bash
+        - "-c"
+        - |
+          set -ex
+          [[ `hostname` =~ -([0-9]+)$ ]] || exit 1
+          ordinal=${BASH_REMATCH[1]}
+          set +ex
+          while true; do
+            nslookup tiflash-${ordinal}.tiflash.tiflash-test.svc
+            if [ ${?} -eq 0 ]; then
+              break;
+            fi
+            sleep 1
+          done
       - name: init-tiflash
         image: hub.pingcap.net/tiflash/tiflash:k8s20191213
         command:
@@ -128,10 +145,10 @@ data:
     tmp_path = "/data/tmp"
     display_name = "TiFlash"
     default_profile = "default"
-    users_config = "users.toml"
+    users_config = "/etc/tiflash/users.toml"
     path = "/data/db"
     mark_cache_size = 5368709120
-    listen_host = "0.0.0.0"
+    listen_host = "tiflash-{pod_num}.tiflash.tiflash-test.svc"
     tcp_port = 9000
     http_port = 8123
     interserver_http_port = 9009
