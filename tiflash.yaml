@@ -1,7 +1,8 @@
 # 0. Build tiflash image and replace all images in this file
 # 1. choose your cluster namespace(tiflash-test in this file), and replace 'tiflash-test' with your namespace
 # 2. install tidb-cluster using tidb-operator in the namespace you choosed
-# 3. kubectl apply -f tiflash.yaml -n {your-namespace}
+# 3. check the storage in storageClassName exists on your cluster
+# 4. kubectl apply -f tiflash.yaml -n {your-namespace}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -102,13 +103,12 @@ spec:
             path: proxy.toml
           - key: manager.toml
             path: manager.toml
-
   volumeClaimTemplates:
   - metadata:
       name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "local-storage"
+      storageClassName: "shared-nvme-disks"
       resources:
         requests:
           storage: 100Gi
