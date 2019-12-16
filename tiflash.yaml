@@ -19,7 +19,7 @@ spec:
     spec:
       initContainers:
       - name: ensure-dns
-        image: hub.pingcap.net/tiflash/tiflash:k8s20191213
+        image: hub.pingcap.net/tiflash/tics:k8s121601
         command:
         - bash
         - "-c"
@@ -36,7 +36,7 @@ spec:
             sleep 1
           done
       - name: init-tiflash
-        image: hub.pingcap.net/tiflash/tiflash:k8s20191213
+        image: hub.pingcap.net/tiflash/tics:k8s121601
         command:
         - bash
         - "-c"
@@ -53,7 +53,7 @@ spec:
           mountPath: /etc/tiflash
       containers:
       - name: tiflash
-        image: hub.pingcap.net/tiflash/tiflash:k8s20191213
+        image: hub.pingcap.net/tiflash/tics:k8s121601
         command:
         - /tiflash
         - server
