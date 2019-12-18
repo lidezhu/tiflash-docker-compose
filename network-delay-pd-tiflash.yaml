@@ -10,7 +10,7 @@ spec:
     namespaces:
       - tiflash-test2
     labelSelectors:
-      "app.kubernetes.io/component": "tikv"
+      "app.kubernetes.io/component": "pd"
   direction: to
   target:
     selector:

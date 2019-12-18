@@ -4,7 +4,7 @@ metadata:
   name: tikv-tiflash
   namespace: tiflash-chaos-testing
 spec:
-  action: delay
+  action: partition
   mode: one
   selector:
     namespaces:
@@ -19,11 +19,6 @@ spec:
       labelSelectors:
         "app": "tiflash"
     mode: one
-  delay:
-    latency: "500ms"
-    correlation: "1"
-    jitter: "500ms"
-  duration: "30s"
+  duration: "10s"
   scheduler:
-    cron: "@every 10s"
-    
+    cron: "@every 15s"

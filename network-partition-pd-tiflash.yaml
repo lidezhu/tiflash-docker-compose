@@ -1,16 +1,16 @@
 apiVersion: pingcap.com/v1alpha1
 kind: NetworkChaos
 metadata:
-  name: tikv-tiflash
+  name: pd-tiflash
   namespace: tiflash-chaos-testing
 spec:
-  action: delay
+  action: partition
   mode: one
   selector:
     namespaces:
       - tiflash-test2
     labelSelectors:
-      "app.kubernetes.io/component": "tikv"
+      "app.kubernetes.io/component": "pd"
   direction: to
   target:
     selector:
@@ -19,11 +19,6 @@ spec:
       labelSelectors:
         "app": "tiflash"
     mode: one
-  delay:
-    latency: "500ms"
-    correlation: "1"
-    jitter: "500ms"
-  duration: "30s"
+  duration: "10s"
   scheduler:
-    cron: "@every 10s"
-    
+    cron: "@every 15s"
