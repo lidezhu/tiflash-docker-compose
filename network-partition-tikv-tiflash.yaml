@@ -1,7 +1,7 @@
 apiVersion: pingcap.com/v1alpha1
 kind: NetworkChaos
 metadata:
-  name: tikv-tiflash
+  name: tikv-tiflash-p
   namespace: tiflash-chaos-testing
 spec:
   action: partition
