@@ -20,9 +20,9 @@ spec:
         "app": "tiflash"
     mode: one
   delay:
-    latency: "500ms"
+    latency: "2000ms"
     correlation: "1"
-    jitter: "500ms"
+    jitter: "100ms"
   duration: "30s"
   scheduler:
     cron: "@every 3s"
