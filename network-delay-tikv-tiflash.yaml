@@ -1,0 +1,28 @@
+apiVersion: pingcap.com/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-delay
+  namespace: tiflash-chaos-testing
+spec:
+  action: delay
+  mode: one
+  selector:
+    namespaces:
+      - tiflash-test2
+    labelSelectors:
+      "app.kubernetes.io/component": "tikv"
+  direction: to
+  target:
+    selector:
+      namespaces:
+        - tiflash-test2
+      labelSelectors:
+        "app": "tiflash"
+    mode: one
+  delay:
+    latency: "200ms"
+    correlation: "0.25"
+    jitter: "200ms"
+  duration: "10s"
+  scheduler:
+    cron: "@every 15s"
