@@ -25,5 +25,5 @@ spec:
     jitter: "500ms"
   duration: "30s"
   scheduler:
-    cron: "@every 10s"
+    cron: "@every 3s"
     
