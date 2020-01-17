@@ -5,7 +5,7 @@ metadata:
   namespace: tiflash-chaos-testing
 spec:
   action: partition
-  mode: one
+  mode: all
   selector:
     namespaces:
       - tiflash-test2
@@ -18,7 +18,7 @@ spec:
         - tiflash-test2
       labelSelectors:
         "app": "tiflash"
-    mode: one
-  duration: "10s"
+    mode: all
+  duration: "20s"
   scheduler:
-    cron: "@every 15s"
+    cron: "@every 40s"
