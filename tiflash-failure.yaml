@@ -1,0 +1,17 @@
+apiVersion: pingcap.com/v1alpha1
+kind: PodChaos
+metadata:
+  name: failure-test
+  namespace: tiflash-chaos-testing
+spec:
+  action: pod-failure
+  mode: one
+  duration: "30s"
+  selector:
+    namespaces:
+      - tiflash-test2
+    labelSelectors:
+      "app": "tiflash"
+  scheduler:
+    cron: "@every 2m"
+    
