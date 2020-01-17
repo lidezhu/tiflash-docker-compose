@@ -5,25 +5,17 @@ metadata:
   namespace: tiflash-chaos-testing
 spec:
   action: delay
-  mode: one
+  mode: all
   selector:
     namespaces:
       - tiflash-test2
     labelSelectors:
       "app.kubernetes.io/component": "tikv"
-  direction: to
-  target:
-    selector:
-      namespaces:
-        - tiflash-test2
-      labelSelectors:
-        "app": "tiflash"
-    mode: one
   delay:
     latency: "2000ms"
     correlation: "1"
     jitter: "100ms"
-  duration: "30s"
+  duration: "20s"
   scheduler:
-    cron: "@every 3s"
+    cron: "@every 40s"
     
